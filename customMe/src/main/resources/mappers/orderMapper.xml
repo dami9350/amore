@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<mapper namespace="com.me.custom.mapper.OrderMapper">
+ 
+ 	<resultMap id="orderList-result" type="com.me.custom.domain.Order">
+        <result property="order_number"         column="ORDER_NUMBER" />
+        <result property="order_code"         column="ORDER_CODE" />
+        <result property="order_date"         column="ORDER_DATE" />
+        <result property="send_date"         column="SEND_DATE" />
+        <result property="order_status"         column="ORDER_STATUS" />
+    </resultMap>
+    
+    <select id="findAll" resultMap="orderList-result">
+        SELECT order_number
+        	 , order_code
+        	 , order_date
+        	 , send_date
+        	 , order_status
+          FROM ORDER_INFO
+         ORDER BY reg_date
+    </select>
+    
+    <select id="findWaitList" parameterType="Integer" resultMap="orderList-result">
+        SELECT TOP #{todayCnt}
+        	   order_number
+        	 , order_code
+        	 , order_date
+        	 , send_date
+        	 , order_status
+          FROM ORDER_INFO
+          WHERE order_status = '1'
+          ORDER BY reg_date
+    </select>
+ 
+    <select id="findByOrderNumber" resultMap="orderList-result">
+        SELECT order_number
+        	 , order_code
+        	 , order_date
+        	 , send_date
+        	 , order_status
+          FROM ORDER_INFO 
+         WHERE order_number = #{order_number}
+    </select>
+    
+    <select id="findCountByOrderNumber" resultType="Integer">
+        SELECT COUNT(0) AS CNT
+          FROM ORDER_INFO 
+         WHERE order_number = #{order_number}
+    </select>
+    
+    <select id="findByToday" resultType="Integer">
+        SELECT COUNT(0) AS CNT
+		  FROM ORDER_INFO
+		 WHERE ORDER_STATUS = '2'
+		   AND FORMATDATETIME(ORDER_DATE, 'yyyy-MM-dd') = #{today}
+    </select>
+    
+    <select id="findByStatus" resultType="Integer">
+        SELECT COUNT(0) AS CNT
+		  FROM ORDER_INFO
+		 WHERE ORDER_STATUS = #{order_status}
+    </select>
+ 
+    <insert id="save" parameterType="com.me.custom.domain.Order">
+        INSERT INTO ORDER_INFO (
+            order_number,
+            order_code,
+            reg_date,
+            order_date,
+            send_date,
+            order_status,
+            error
+        )
+        VALUES (
+            #{order_number},
+            #{order_code},
+            NOW(),
+            #{order_date},
+            #{send_date},
+            #{order_status},
+            #{error}
+        )
+    </insert>
+ 
+    <update id="updateSendDate" parameterType="com.me.custom.domain.Order">
+        UPDATE ORDER_INFO
+           SET send_date = #{send_date}
+         WHERE order_number = #{order_number};
+    </update>
+    
+    <update id="updateOrderStatus" parameterType="com.me.custom.domain.Order">
+        UPDATE ORDER_INFO
+           SET order_status = #{order_status}
+         WHERE order_number = #{order_number};
+    </update>
+ 
+    <delete id="deleteByOrderNumber">
+       DELETE FROM ORDER_INFO WHERE order_number = #{order_number};
+    </delete>
+    
+    <update id="updateSendStatus">
+        UPDATE ORDER_INFO a
+		   SET a.order_status = '5'
+		     , a.send_date = NOW()
+		 WHERE EXISTS
+			   (SELECT * FROM ORDER_INFO b WHERE b.order_number = a.order_number and b.order_status = '2')
+    </update>
+    
+    <update id="updateProduceStatus">
+       UPDATE ORDER_INFO a
+		  SET a.order_status = '2'
+		WHERE exists
+			  (SELECT TOP 30 * FROM ORDER_INFO b WHERE b.order_number = a.order_number and b.order_status = '1' ORDER BY b.REG_DATE)
+    </update>
+ 
+</mapper>

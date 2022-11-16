@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<mapper namespace="com.me.custom.mapper.MaterialMapper">
+ 
+ 	<resultMap id="materialList-result" type="com.me.custom.domain.Material">
+        <result property="name"           column="NAME" />
+        <result property="amount"         column="AMOUNT" />
+        <result property="status"         column="STATUS" />
+        <result property="supply_date"    column="SUPPLY_DATE" />
+    </resultMap>
+    
+    <select id="findAll" resultMap="materialList-result">
+        SELECT name
+        	 , amount
+        	 , status
+        	 , supply_date
+          FROM MATERIAL
+         ORDER BY name 
+    </select>
+ 
+ 	<select id="findByName" resultMap="materialList-result">
+        SELECT TOP 1 name
+        	 , amount
+        	 , status
+		  FROM MATERIAL
+		 WHERE name = #{name}
+    </select>
+    
+    <select id="findByStatus" resultType="Integer">
+        SELECT COUNT(0) AS cnt
+		  FROM MATERIAL
+		 WHERE status = #{status}
+    </select>
+    
+    <select id="findMaxSupplyDateByStatus" resultType="java.time.LocalDateTime">
+        SELECT ISNULL(MAX(supply_date), TIMESTAMPADD(SECOND, -40, NOW()) ) AS MAX_SUPPLY_DATE
+		  FROM MATERIAL
+		 WHERE status = #{status}
+    </select>
+ 
+    <insert id="save" parameterType="com.me.custom.domain.Material">
+        INSERT INTO MATERIAL (
+            name,
+            amount,
+            status
+        )
+        VALUES (
+            #{name},
+            #{amount},
+            #{status}
+        )
+    </insert>
+ 
+    <update id="updateAmount" parameterType="com.me.custom.domain.Material">
+        UPDATE MATERIAL
+           SET 
+           	   amount = #{amount}
+         WHERE name = #{name}
+    </update>
+    
+    <update id="updateStatus" parameterType="com.me.custom.domain.Material">
+        UPDATE MATERIAL
+           SET 
+           	   status = #{status}
+           	 , supply_date = #{supply_date}
+         WHERE name = #{name}
+    </update>
+    
+    <update id="updateSupplyInfo" parameterType="com.me.custom.domain.Material">
+        UPDATE MATERIAL
+           SET amount = #{amount}
+           	 , status = #{status}
+           	 , supply_date = #{supply_date}
+         WHERE name = #{name}
+    </update>
+ 
+    <delete id="deleteByName">
+       DELETE FROM MATERIAL WHERE name = #{name}
+    </delete>
+    
+    <select id="findBySupplyDate" resultMap="materialList-result">
+    <![CDATA[
+        SELECT TOP 1 
+        	   name
+        	 , amount
+        	 , status
+        	 , supply_date
+		  FROM MATERIAL
+		 WHERE status = '2'
+		   AND supply_date <= NOW()
+		 ORDER BY supply_date
+	]]>
+    </select>
+ 
+</mapper>
