@@ -19,6 +19,7 @@
     }
  
 # 특이사항
+- h2 db console url : http://localhost:8080/h2-console/login.jsp (id : sa, pw : 없음)
 - 주문 입력 url : http://localhost:8080/order
 - 근무 시간외 처리(제품 생산 -> 발송, 주문 접수 -> 제품 생산), 원료 보충은 Spring Scheduled 로 처리
 - 근무 시간외 처리 배치는 5초마다 실행, 생산 설비의 상태 로그는 10초마다 실행
