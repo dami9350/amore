@@ -8,7 +8,7 @@
 
 # 빌드 및 실행
  1. https://github.com/dami9350/amore 에서 소스 zip 파일로 다운로드 후 압축 해제
- 2. sts 또는 eclipse 에서 inport -> Maven -> Existing Maven Projects 클릭 후 압축 해제된 customMe 폴더 선택
+ 2. sts 또는 eclipse 에서 iport -> Maven -> Existing Maven Projects 클릭 후 압축 해제된 customMe 폴더 선택
  3. tomcat 실행(h2 db 스키마 및 데이터 자동 생성 됨)
  4. postman 등을 통해 http://localhost:8080/order 를 post로 json 형식으로 호출
     ex) 
